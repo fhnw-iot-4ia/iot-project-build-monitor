@@ -1,8 +1,5 @@
 # IoT Engineering
-## Project MY_TEAM_PROJECT_TITLE
-
-> *Note: Do not work on this repository right away.*<br/>
-> *[Create your team copy by clicking this GitHub Classroom link](https://classroom.github.com/g/B7ncqTw4).*
+## Project Build Monitor
 
 ## Introduction
 This project is part of the [IoT Engineering](../../../fhnw-iot) course.
@@ -14,8 +11,8 @@ This project is part of the [IoT Engineering](../../../fhnw-iot) course.
 * Both team members are able to explain the project.
 
 ### Team members
-* @MY_TEAM_PROJECT_GITHUB_USER_1, REAL_NAME_1
-* @MY_TEAM_PROJECT_GITHUB_USER_2, REAL_NAME_2
+* @Digitalninja01, Alessandro Calcagno
+* @keniseli, Ken Iseli
 
 ## Deliverables
 The following deliverables are mandatory.
@@ -23,13 +20,9 @@ The following deliverables are mandatory.
 ### Source code
 Source code, Arduino C, JS or Python, committed to (this) project repo.
 
-[Arduino/MY_TEAM_PROJECT/MY_TEAM_PROJECT.ino](Arduino/MY_TEAM_PROJECT_FILE.ino)
-
-[Nodejs/MY_TEAM_PROJECT.js](Nodejs/MY_TEAM_PROJECT_FILE.js)
-
-[Python/MY_TEAM_PROJECT.py](Nodejs/MY_TEAM_PROJECT_FILE.py)
-
-... (adapt as required)
+Embedded code: [build-monitor.ino](Arduino/src/build-monitor.ino)
+Gateway code: [todo](todo)
+App code: [todo](todo)
 
 1) Embedded code / microcontroller firmware.
 2) Glue Code used on the gateway or "in the cloud".
@@ -38,7 +31,7 @@ Source code, Arduino C, JS or Python, committed to (this) project repo.
 ### Presentation
 4-slide presentation, PDF format, committed to (this) project repo.
 
-[MY_TEAM_PROJECT_PRESENTATION.pdf](MY_TEAM_PROJECT_PRESENTATION.pdf)
+[build-monitor-presentation.pdf](build-monitor-presentation.pdf)
 
 1) Use-case of your project.
 2) Reference model of your project.
@@ -48,7 +41,7 @@ Source code, Arduino C, JS or Python, committed to (this) project repo.
 ### Live demo
 Working end-to-end prototype, "device to cloud", part of your 10' presentation.
 
-[https://MY_TEAM_PROJECT_DEMO_HOST:PORT/](https://MY_TEAM_PROJECT_DEMO_HOST:PORT/)
+[https://todo:PORT/](https://todo:PORT/)
 
 1) Sensor input on a IoT device triggers an event.
 2) The event or measurement shows up online, in an app or Web client.
