@@ -3,6 +3,10 @@
 
 #define NUM_LEDS 1
 
+
+
+
+/******************** hardware & wiring *******************/
 int clk_pin = 9; // D4
 int data_pin = 10; // D5
 ChainableLED leds(clk_pin, data_pin, NUM_LEDS);
@@ -11,27 +15,56 @@ int button_pin = A0;
 int button_value = LOW;
 
 int buzzer_pin = 5; // D2
+/**********************************************************/
 
+
+
+
+/************************** states ************************/
 int state = 0;
-// 1-digit states: business states
-//  0 = not in alarm state
-//  1 = in alarm state
-// 2-digit states from 50 upwards: control states
-//  50 = setup
-//  51 = connecting to gateway
 
-int alarm_state = 0;
+// INTERNAL STATES
+int BUILD_SUCCEEDED = 0;
+int BUILD_FAILED = 1;
+int SETUP = 50;
+int ADVERTISING = 51;
+
+// BLE STATES FROM PI
+uint16_t BUILD_SUCCEEDED_NOTIFICATION = 0x00;
+uint16_t BUILD_FAILED_NOTIFICATION = 0x01;
+
 // 0 = green, everything okay
 // 1 = red, alarm
 // 2 = blue, alarm
+/**********************************************************/
 
+
+
+
+/********************* color management ********************/
+int GREEN = 0;
+int RED = 1;
+int BLUE = 2;
+int NO_COLOR = 99;
+
+/* returns the first value if tick is true, the second if tick is false */
+int determineTickingColor(int firstColor, int secondColor, boolean tick);
+
+boolean tick;
+int color_state = GREEN;
+/**********************************************************/
+
+
+
+
+/**************** ble fields & methods ********************/
 BLEService bleService = BLEService(0x4242);
-BLECharacteristic characteristic = BLECharacteristic(0x2727);
+BLECharacteristic buildStatusCharacteristic = BLECharacteristic(0x2727);
 void connectCallback(uint16_t conn_handle);
 void disconnectCallback(uint16_t conn_handle, uint8_t reason);
-void cccdCallback(BLECharacteristic& characteristic, uint16_t cccdValue);
 void setupBLE();
 void startAdvertising();
+/**********************************************************/
 
 
 void setup() {
@@ -52,39 +85,57 @@ void loop() {
   Serial.begin(115200);
   button_value = digitalRead(button_pin);
 
-  uint8_t data[2] = { 0b00000110, button_value };
-  characteristic.notify(data, sizeof(data));
+  //uint8_t data[2] = { 0b00000110, button_value };
+  //buildStatusCharacteristic.notify(data, sizeof(data));
 
-  if (state == 0 && button_value == HIGH) {
+  if (state == BUILD_SUCCEEDED && button_value == HIGH) {
     Serial.println("state 0, button triggers state 1 for testing");
-    state = 1;
-    
-  } else if(state == 1 && button_value == HIGH) {
+    state = BUILD_FAILED;
+  } else if(state == BUILD_FAILED && button_value == HIGH) {
     Serial.println("state 1, button triggers state 0");
-    state = 0;
-    alarm_state = 0;
-    
-  } else if (state == 1 && button_value == LOW) {
-    if (alarm_state != 1) {
-      alarm_state = 1;
-    } else {
-      alarm_state = 2;
-    }
+    state = BUILD_SUCCEEDED;
+    color_state = GREEN;
+  } else if (state == BUILD_FAILED && button_value == LOW) {
+    color_state = determineTickingColor(RED, BLUE, tick);
+  } else if (state == ADVERTISING) {
+    color_state = determineTickingColor(BLUE, NO_COLOR, tick);
   }
 
-  if (alarm_state == 0) {
+  if (color_state == GREEN) {
     leds.setColorRGB(0, 0, 255, 0);
     digitalWrite(buzzer_pin, LOW);
-  } else if (alarm_state == 1) {
+  } else if (color_state == RED) {
     leds.setColorRGB(0, 255, 0, 0);
     digitalWrite(buzzer_pin, HIGH);
-  } else if (alarm_state == 2) {
+  } else if (color_state == BLUE) {
     leds.setColorRGB(0, 0, 255, 255);
     digitalWrite(buzzer_pin, LOW);
+  } else if (color_state == NO_COLOR) {
+    leds.setColorRGB(0, 0, 0, 0);
   }
-  delay(100);
+  tick = !tick;
+  delay(150);
 }
 
+int determineTickingColor(int firstColor, int secondColor, boolean tick) {
+  if (tick) {
+    return firstColor;
+  } else {
+    return secondColor;
+  }
+}
+
+void writeCallback(BLECharacteristic& givenCharacteristic, unsigned char* data, short unsigned int len, short unsigned int a) {
+  if (givenCharacteristic.uuid == buildStatusCharacteristic.uuid) {
+    Serial.print("write callback called");
+    Serial.print(*data);
+    if (*data == BUILD_FAILED_NOTIFICATION) {
+      state = BUILD_FAILED;
+    } else if (*data == BUILD_SUCCEEDED_NOTIFICATION) {
+      state = BUILD_SUCCEEDED;
+    }
+  }
+}
 
 void setupBLE() {
   Bluefruit.begin();
@@ -94,14 +145,12 @@ void setupBLE() {
   
   bleService.begin(); // Must be called before calling .begin() on its characteristics
 
-  characteristic.setProperties(CHR_PROPS_NOTIFY);
-  characteristic.setPermission(SECMODE_OPEN, SECMODE_NO_ACCESS);
-  characteristic.setFixedLen(2);
-  characteristic.setCccdWriteCallback(cccdCallback);  // Optionally capture CCCD updates
-  characteristic.begin();
-  uint8_t data[2] = { 0b00000110, 0x40 }; // Use 8-bit values, sensor connected and detected
-  characteristic.notify(data, 2); // Use .notify instead of .write
-  
+  buildStatusCharacteristic.setProperties(CHR_PROPS_WRITE);
+  buildStatusCharacteristic.setPermission(SECMODE_NO_ACCESS, SECMODE_OPEN);
+  buildStatusCharacteristic.setFixedLen(1);
+  buildStatusCharacteristic.setWriteCallback(writeCallback);
+  buildStatusCharacteristic.begin();
+
   startAdvertising();
 }
 
@@ -111,6 +160,9 @@ void connectCallback(uint16_t conn_handle) {
 
   Serial.print("Connected to ");
   Serial.println(central_name);
+
+  state = BUILD_SUCCEEDED;
+  color_state = GREEN;
 }
 
 void disconnectCallback(uint16_t connectionHandle, uint8_t reason) {
@@ -119,18 +171,7 @@ void disconnectCallback(uint16_t connectionHandle, uint8_t reason) {
   Serial.println(reason); // see https://github.com/adafruit/Adafruit_nRF52_Arduino
   // /blob/master/cores/nRF5/nordic/softdevice/s140_nrf52_6.1.1_API/include/ble_hci.h
   Serial.println("Advertising ...");
-}
-
-
-void cccdCallback(BLECharacteristic& givenCharacteristic, uint16_t cccdValue) {
-  if (givenCharacteristic.uuid == characteristic.uuid) {
-    Serial.print("Heart Rate Measurement 'Notify', ");
-    if (givenCharacteristic.notifyEnabled()) {
-      Serial.println("enabled");
-    } else {
-      Serial.println("disabled");
-    }
-  }
+  startAdvertising();
 }
 
 void startAdvertising() {
@@ -148,5 +189,8 @@ void startAdvertising() {
   Bluefruit.Advertising.setFastTimeout(fastModeTimeout);
   // 0 = continue advertising after fast mode, until connected
   Bluefruit.Advertising.start(0);
-  Serial.println("Advertising ...");
+
+  state = ADVERTISING;
+
+  Serial.println("Advertising");
 }
