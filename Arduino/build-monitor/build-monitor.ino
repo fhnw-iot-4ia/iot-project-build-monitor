@@ -112,8 +112,10 @@ void loop() {
   } else if (state == BUILD_FAILED && button_value == LOW) {
     delays = 150;
     color_state = determineTickingColor(RED, BLUE, tick);
+    buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
   } else if (state == ADVERTISING) {
     color_state = determineTickingColor(BLUE, NO_COLOR, tick);
+    buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
   } else if (state == BUILD_FIXING) {
     delays = 600;
     buildFixingCharacteristic.write16(BUILD_FIXING_NOTIFICATION);
@@ -121,6 +123,7 @@ void loop() {
     color_state = determineTickingColor(YELLOW, ORANGE, tick);
   } else if (state == BUILD_FIXING_WAITING) {
     color_state = determineTickingColor(PURPLE1, PURPLE2, tick);
+    buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
   }
 
   if (color_state == GREEN) {
