@@ -26,12 +26,19 @@ int state = 0;
 // INTERNAL STATES
 int BUILD_SUCCEEDED = 0;
 int BUILD_FAILED = 1;
+int BUILD_FIXING = 2;
+int BUILD_FIXING_WAITING = 3;
 int SETUP = 50;
 int ADVERTISING = 51;
 
 // BLE STATES FROM PI
 uint16_t BUILD_SUCCEEDED_NOTIFICATION = 0x00;
 uint16_t BUILD_FAILED_NOTIFICATION = 0x01;
+uint16_t BUILD_FIXING_BY_SOMEONE_ELSE = 0x02;
+
+// BLE STATES FOR PI
+uint16_t BUILD_NOT_FIXING_NOTIFICATION = 0x00;
+uint16_t BUILD_FIXING_NOTIFICATION = 0x01;
 
 // 0 = green, everything okay
 // 1 = red, alarm
@@ -45,12 +52,17 @@ uint16_t BUILD_FAILED_NOTIFICATION = 0x01;
 int GREEN = 0;
 int RED = 1;
 int BLUE = 2;
+int YELLOW = 3;
+int PURPLE1 = 4;
+int PURPLE2 = 5;
+int ORANGE = 6;
 int NO_COLOR = 99;
 
 /* returns the first value if tick is true, the second if tick is false */
 int determineTickingColor(int firstColor, int secondColor, boolean tick);
 
 boolean tick;
+int delays = 300;
 int color_state = GREEN;
 /**********************************************************/
 
@@ -60,6 +72,7 @@ int color_state = GREEN;
 /**************** ble fields & methods ********************/
 BLEService bleService = BLEService(0x4242);
 BLECharacteristic buildStatusCharacteristic = BLECharacteristic(0x2727);
+BLECharacteristic buildFixingCharacteristic = BLECharacteristic(0x2728);
 void connectCallback(uint16_t conn_handle);
 void disconnectCallback(uint16_t conn_handle, uint8_t reason);
 void setupBLE();
@@ -84,21 +97,30 @@ void setup() {
 void loop() {
   Serial.begin(115200);
   button_value = digitalRead(button_pin);
+  delays = 300;
 
-  //uint8_t data[2] = { 0b00000110, button_value };
-  //buildStatusCharacteristic.notify(data, sizeof(data));
-
+  // TODO: remove the first if block for production. This serves only to trigger a failed build
   if (state == BUILD_SUCCEEDED && button_value == HIGH) {
-    Serial.println("state 0, button triggers state 1 for testing");
+    Serial.println("trigger failed build for testing");
     state = BUILD_FAILED;
-  } else if(state == BUILD_FAILED && button_value == HIGH) {
-    Serial.println("state 1, button triggers state 0");
-    state = BUILD_SUCCEEDED;
+  } else if (state == BUILD_SUCCEEDED && button_value == LOW) {
     color_state = GREEN;
+    buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
+  } else if (state == BUILD_FAILED && button_value == HIGH) {
+    Serial.println("state failed, button triggers state fixing");
+    state = BUILD_FIXING;
   } else if (state == BUILD_FAILED && button_value == LOW) {
+    delays = 150;
     color_state = determineTickingColor(RED, BLUE, tick);
   } else if (state == ADVERTISING) {
     color_state = determineTickingColor(BLUE, NO_COLOR, tick);
+  } else if (state == BUILD_FIXING) {
+    delays = 600;
+    buildFixingCharacteristic.write16(BUILD_FIXING_NOTIFICATION);
+    delays = 600;
+    color_state = determineTickingColor(YELLOW, ORANGE, tick);
+  } else if (state == BUILD_FIXING_WAITING) {
+    color_state = determineTickingColor(PURPLE1, PURPLE2, tick);
   }
 
   if (color_state == GREEN) {
@@ -112,9 +134,17 @@ void loop() {
     digitalWrite(buzzer_pin, LOW);
   } else if (color_state == NO_COLOR) {
     leds.setColorRGB(0, 0, 0, 0);
+  } else if (color_state == YELLOW) {
+    leds.setColorRGB(0, 255, 213, 87);
+  } else if (color_state == ORANGE) {
+    leds.setColorRGB(0, 255, 191, 0);
+  } else if (color_state == PURPLE1) {
+    leds.setColorRGB(0, 169, 77, 209);
+  } else if (color_state == PURPLE2) {
+    leds.setColorRGB(0, 114, 4, 183);
   }
   tick = !tick;
-  delay(150);
+  delay(delays);
 }
 
 int determineTickingColor(int firstColor, int secondColor, boolean tick) {
@@ -127,12 +157,16 @@ int determineTickingColor(int firstColor, int secondColor, boolean tick) {
 
 void writeCallback(BLECharacteristic& givenCharacteristic, unsigned char* data, short unsigned int len, short unsigned int a) {
   if (givenCharacteristic.uuid == buildStatusCharacteristic.uuid) {
-    Serial.print("write callback called");
-    Serial.print(*data);
+    Serial.print("write callback called ");
+    Serial.println(*data);
     if (*data == BUILD_FAILED_NOTIFICATION) {
+      Serial.println("build failed");
       state = BUILD_FAILED;
     } else if (*data == BUILD_SUCCEEDED_NOTIFICATION) {
+      Serial.println("build succeeded");
       state = BUILD_SUCCEEDED;
+    } else if (*data == BUILD_FIXING_BY_SOMEONE_ELSE) {
+      state = BUILD_FIXING_WAITING;
     }
   }
 }
@@ -151,6 +185,12 @@ void setupBLE() {
   buildStatusCharacteristic.setWriteCallback(writeCallback);
   buildStatusCharacteristic.begin();
 
+  buildFixingCharacteristic.setProperties(CHR_PROPS_READ);
+  buildFixingCharacteristic.setPermission(SECMODE_OPEN, SECMODE_NO_ACCESS);
+  buildFixingCharacteristic.setFixedLen(1);
+  buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
+  buildFixingCharacteristic.begin();
+  
   startAdvertising();
 }
 
