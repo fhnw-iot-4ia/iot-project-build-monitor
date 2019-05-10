@@ -1,11 +1,10 @@
-# Development Guide
-## Prerequisites
+# Prerequisites
 In order to get started you will need the following:
 1) Have Arduino installed (preferably version 1.8.8)
 2) Have the board Adafruit nRF52840 installed
 3) Have the [Chainable LED library](https://github.com/pjpmarques/ChainableLED) installed. It is also present in the lib directory. Follow [this guide](http://wiki.seeedstudio.com/How_to_install_Arduino_Library/)
 
-## Hardware
+# Hardware
 The hardware is wired according to the following table:
 
 Hardware component | Purpose | Wiring
@@ -16,7 +15,7 @@ Chainable LED | Gives visual feedback on the build status | `D4/D5` on Grove Shi
 Buzzer | Gives acoustic feedback if the build failed | `D2` on Grove Shield
 Button | Used to commit fixing of failed build | `A0`
 
-## State Machine
+# State Machine
 The code is structured as a time machine. The main state is an int which can take on of the following states:
 
 State Name | Triggered by | characteristic uuid `0x2728` (readable) | Buzzer | Light Bulb | Description 
