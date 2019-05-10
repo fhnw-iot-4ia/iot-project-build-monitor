@@ -28,8 +28,7 @@ int BUILD_SUCCEEDED = 0;
 int BUILD_FAILED = 1;
 int BUILD_FIXING = 2;
 int BUILD_FIXING_WAITING = 3;
-int SETUP = 50;
-int ADVERTISING = 51;
+int ADVERTISING = 50;
 
 // BLE STATES FROM PI
 uint16_t BUILD_SUCCEEDED_NOTIFICATION = 0x00;
@@ -70,6 +69,7 @@ int color_state = GREEN;
 
 
 /**************** ble fields & methods ********************/
+// TODO: Check codes with coach
 BLEService bleService = BLEService(0x4242);
 BLECharacteristic buildStatusCharacteristic = BLECharacteristic(0x2727);
 BLECharacteristic buildFixingCharacteristic = BLECharacteristic(0x2728);
