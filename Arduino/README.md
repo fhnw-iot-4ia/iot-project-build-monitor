@@ -22,8 +22,8 @@ The code is structured as a time machine. The main state is an int which can tak
 
 State Name | Triggered by | characteristic uuid `0x2728` (readable) | Buzzer | Light Bulb | Description 
 ---------- | ------------ | ------------------------------------------- | ------ | ---------- | -----------
-`BUILD_SUCCEEDED`  | `0x00` on characteristic uuid `0x2727`) | `0x00` | - | Green | Indicates that the las build was successful
-`BUILD_FAILED` | `0x01` on characteristic uuid `0x2727`) | `0x00` | On | Red blue blinking | Indicates that the last build failed
+`BUILD_SUCCEEDED`  | `0x00` on characteristic uuid `0x2727` | `0x00` | - | Green | Indicates that the las build was successful
+`BUILD_FAILED` | `0x01` on characteristic uuid `0x2727` | `0x00` | On | Red blue blinking | Indicates that the last build failed
 `BUILD_FIXING` | Physical button pressed | `0x01` | - | Different yellow blinking | Indicates that the user is working on the build (all other build monitors are in the state `BUILD_FIXING_WAITING`)
-`BUILD_FIXING_WAITING` | `0x02` characteristic uuid `0x2727`) | `0x00` | - | Different purple blinking | Indicates that someone else is working on the build (one other build monitor is in the state `BUILD_FIXING`)
+`BUILD_FIXING_WAITING` | `0x02` characteristic uuid `0x2727` | `0x00` | - | Different purple blinking | Indicates that someone else is working on the build (one other build monitor is in the state `BUILD_FIXING`)
 `ADVERTISING`  | Initialization procedure on startup | `0x00` | - | Blue blinking | Indicates that build monitor waits for a central to connect
