@@ -4,7 +4,6 @@ In order to get started you will need the following:
 1) Have Arduino installed (preferably version 1.8.8)
 2) Have the board Adafruit nRF52840 installed
 3) Have the [Chainable LED library](https://github.com/pjpmarques/ChainableLED) installed. It is also present in the lib directory. Follow [this guide](http://wiki.seeedstudio.com/How_to_install_Arduino_Library/)
-4) Have the Hardware wired up according to the image: TODO
 
 ## Hardware
 The hardware is wired according to the following table:
