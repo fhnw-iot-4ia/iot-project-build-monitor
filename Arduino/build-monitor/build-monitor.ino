@@ -82,7 +82,6 @@ void startAdvertising();
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) { delay(10); } // only if usb connected
   Serial.println("Setup");
 
   pinMode(clk_pin, OUTPUT);
@@ -98,6 +97,7 @@ void loop() {
   Serial.begin(115200);
   button_value = digitalRead(button_pin);
   delays = 300;
+  digitalWrite(buzzer_pin, LOW);
 
   // TODO: remove the first if block for production. This serves only to trigger a failed build
   if (state == BUILD_SUCCEEDED && button_value == HIGH) {
@@ -107,6 +107,7 @@ void loop() {
     color_state = GREEN;
     buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
   } else if (state == BUILD_FAILED && button_value == HIGH) {
+    digitalWrite(buzzer_pin, LOW);
     Serial.println("state failed, button triggers state fixing");
     state = BUILD_FIXING;
   } else if (state == BUILD_FAILED && button_value == LOW) {
@@ -128,13 +129,11 @@ void loop() {
 
   if (color_state == GREEN) {
     leds.setColorRGB(0, 0, 255, 0);
-    digitalWrite(buzzer_pin, LOW);
   } else if (color_state == RED) {
     leds.setColorRGB(0, 255, 0, 0);
     digitalWrite(buzzer_pin, HIGH);
   } else if (color_state == BLUE) {
     leds.setColorRGB(0, 0, 255, 255);
-    digitalWrite(buzzer_pin, LOW);
   } else if (color_state == NO_COLOR) {
     leds.setColorRGB(0, 0, 0, 0);
   } else if (color_state == YELLOW) {
