@@ -111,6 +111,7 @@ void loop() {
     Serial.println("state failed, button triggers state fixing");
     state = BUILD_FIXING;
   } else if (state == BUILD_FAILED && button_value == LOW) {
+    digitalWrite(buzzer_pin, HIGH);
     delays = 150;
     color_state = determineTickingColor(RED, BLUE, tick);
     buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
@@ -131,7 +132,6 @@ void loop() {
     leds.setColorRGB(0, 0, 255, 0);
   } else if (color_state == RED) {
     leds.setColorRGB(0, 255, 0, 0);
-    digitalWrite(buzzer_pin, HIGH);
   } else if (color_state == BLUE) {
     leds.setColorRGB(0, 0, 255, 255);
   } else if (color_state == NO_COLOR) {
