@@ -119,7 +119,6 @@ void loop() {
     color_state = determineTickingColor(BLUE, NO_COLOR, tick);
     buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
   } else if (state == BUILD_FIXING) {
-    delays = 600;
     buildFixingCharacteristic.write16(BUILD_FIXING_NOTIFICATION);
     delays = 600;
     color_state = determineTickingColor(YELLOW, ORANGE, tick);
@@ -130,19 +129,27 @@ void loop() {
 
   if (color_state == GREEN) {
     leds.setColorRGB(0, 0, 255, 0);
+    Serial.println("green");
   } else if (color_state == RED) {
     leds.setColorRGB(0, 255, 0, 0);
+    Serial.println("red");
   } else if (color_state == BLUE) {
+    Serial.println("blue");
     leds.setColorRGB(0, 0, 255, 255);
   } else if (color_state == NO_COLOR) {
+    Serial.println("no color");
     leds.setColorRGB(0, 0, 0, 0);
   } else if (color_state == YELLOW) {
+    Serial.println("yellow");
     leds.setColorRGB(0, 255, 213, 87);
   } else if (color_state == ORANGE) {
+    Serial.println("orange");
     leds.setColorRGB(0, 255, 191, 0);
   } else if (color_state == PURPLE1) {
+    Serial.println("purple 1");
     leds.setColorRGB(0, 169, 77, 209);
   } else if (color_state == PURPLE2) {
+    Serial.println("purple 2");
     leds.setColorRGB(0, 114, 4, 183);
   }
   tick = !tick;
