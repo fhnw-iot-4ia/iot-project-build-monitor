@@ -1,8 +1,11 @@
 const noble = require("@abandonware/noble");
+const mqtt = require("mqtt");
+
+const broker = "mqtt://test.mosquitto.org";
+const client = mqtt.connect(broker);
 
 const serviceUuid = "4242";
-const buildStatusCharacteristicUuid = ["2727"];
-const fixingStatusCharacteristicUuid = ["2728"];
+const characteristicUuids = ["2727", "2728"];
 
 let buildStatusCharacteristic = undefined;
 let fixingStatusCharacteristic = undefined;
@@ -13,60 +16,61 @@ noble.on("discover", (peripheral) => {
         peripheral.address + ", " +
         peripheral.advertisement.localName + ", " +
         peripheral.advertisement.uuid);
-    peripheral.connect((err) => {
+    peripheral.connect((error) => {
         console.log("connected");
-        peripheral.discoverServices([serviceUuid], (err, services) => {
+        peripheral.discoverServices([serviceUuid], (error, services) => {
             console.log("discovered services " + services);
             services.forEach((service) => {
                 console.log("found service:", service.uuid);
-                service.discoverCharacteristics(buildStatusCharacteristicUuid, (err, characteristics) => {
+                service.discoverCharacteristics(characteristicUuids, (error, characteristics) => {
                     characteristics.forEach((characteristic) => {
-                        console.log("found build status characteristic:", characteristic.uuid);
-                        buildStatusCharacteristic = characteristic;
-                        console.log("writing 0x01...");
-                        let data = Buffer.from([0x01]);
-                        buildStatusCharacteristic.write(data, true);
-                        setTimeout(() => {
-                            console.log("writing 0x02...");
-                            data = Buffer.from([0x02]);
-                            buildStatusCharacteristic.write(data, true);
-                            setTimeout(() => {
-                                console.log("writing 0x00...");
-                                data = Buffer.from([0x00]);
-                                buildStatusCharacteristic.write(data, true);
-                            }, 2000);
-                        }, 2000);
-                    });
-                });
-                /*service.discoverCharacteristics(fixingStatusCharacteristicUuid, (err, characteristics) => {
-                    characteristics.forEach((characteristic) => {
-                        console.log("found fixing build characteristic:", characteristic.uuid);
-                        fixingStatusCharacteristic = characteristic;
-                        try {
-                            fixingStatusCharacteristic.read((error, data) => {
-                                console.log(data.readUInt8());
-                            });
-                        } catch(error) {
-                            console.log(error);
+                        console.log("found characteristic:", characteristic.uuid);
+                        if (characteristic.uuid === "2727") {
+                            buildStatusCharacteristic = characteristic;
+                            console.log("found 2727");
+                        } else if (characteristic.uuid === "2728") {
+                            fixingStatusCharacteristic = characteristic;
+                            console.log("found 2728");
                         }
                     });
-                });*/
-
-                /*characteristics.forEach((characteristic) => {
-                    console.log("found characteristic:", characteristic.uuid);
-                    characteristic.write((error, data) => {
-                        const value = data.readUInt8(0);
-                        console.log("read characteristic value:", value);
-                        peripheral.disconnect((err) => {
-                            console.log("disconnected");
-                            process.exit();
-                        });
-                    });
-                });*/
+                });
             });
         });
+        /*
+        console.log("reading fixing status...");
+        try {
+            fixingStatusCharacteristic.read((error, data) => {
+                console.log(data.readUInt16());
+            });
+        } catch(error) {
+            console.log(error);
+        }*/
     });
 });
 
-console.log("scanning...");
-noble.startScanning(serviceUuid);
+client.on("connect", () => {
+    console.log("connected over mqtt");
+    client.subscribe("build-monitor/build-status", error => {
+        if (error) {
+            console.log(error);
+        }
+    });
+    client.on("message", (topic, message) => {
+        console.log(topic + " : " + message.toString());
+        if (buildStatusCharacteristic !== undefined) {
+            let receivedState = message.toString();
+            if (receivedState === '00') {
+                let data = Buffer.from([0x00]);
+                buildStatusCharacteristic.write(data, true);
+            } else if (receivedState === '01') {
+                let data = Buffer.from([0x01]);
+                buildStatusCharacteristic.write(data, true);
+            } else if (receivedState === '02') {
+                let data = Buffer.from([0x02]);
+                buildStatusCharacteristic.write(data, true);
+            }
+        }
+    });
+    console.log("scanning...");
+    noble.startScanning(serviceUuid);
+});
