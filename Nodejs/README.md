@@ -9,7 +9,7 @@ In order to get started you will need the following:
 # Hardware
 The raspberry 0 hardware has to be connected over the USB Port
 
-# State Machine
+# Code
 The code is structured as a rudimentary asynchronous program. It connects to an mqtt topic and to a bluetooth low energy service, resulting in two parts:
 
 ## BLE Part
