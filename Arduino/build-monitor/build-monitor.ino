@@ -36,8 +36,8 @@ uint16_t BUILD_FAILED_NOTIFICATION = 0x01;
 uint16_t BUILD_FIXING_BY_SOMEONE_ELSE = 0x02;
 
 // BLE STATES FOR PI
-uint16_t BUILD_NOT_FIXING_NOTIFICATION = 0x00;
-uint16_t BUILD_FIXING_NOTIFICATION = 0x01;
+uint8_t BUILD_NOT_FIXING_NOTIFICATION[1] = { 0x00 };
+uint8_t BUILD_FIXING_NOTIFICATION[1] = { 0x01 };
 
 // 0 = green, everything okay
 // 1 = red, alarm
@@ -105,26 +105,24 @@ void loop() {
     state = BUILD_FAILED;
   } else if (state == BUILD_SUCCEEDED && button_value == LOW) {
     color_state = GREEN;
-    buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
   } else if (state == BUILD_FAILED && button_value == HIGH) {
     digitalWrite(buzzer_pin, LOW);
+    buildFixingCharacteristic.notify(BUILD_FIXING_NOTIFICATION, sizeof(BUILD_FIXING_NOTIFICATION));
     Serial.println("state failed, button triggers state fixing");
     state = BUILD_FIXING;
   } else if (state == BUILD_FAILED && button_value == LOW) {
-    digitalWrite(buzzer_pin, HIGH);
+    if (color_state == RED) {
+      digitalWrite(buzzer_pin, HIGH);
+    }
     delays = 150;
     color_state = determineTickingColor(RED, BLUE, tick);
-    buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
   } else if (state == ADVERTISING) {
     color_state = determineTickingColor(BLUE, NO_COLOR, tick);
-    buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
   } else if (state == BUILD_FIXING) {
-    buildFixingCharacteristic.write16(BUILD_FIXING_NOTIFICATION);
     delays = 600;
     color_state = determineTickingColor(YELLOW, ORANGE, tick);
   } else if (state == BUILD_FIXING_WAITING) {
     color_state = determineTickingColor(PURPLE1, PURPLE2, tick);
-    buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
   }
 
   if (color_state == GREEN) {
@@ -174,7 +172,7 @@ void writeCallback(BLECharacteristic& givenCharacteristic, unsigned char* data, 
     } else if (*data == BUILD_SUCCEEDED_NOTIFICATION) {
       Serial.println("build succeeded");
       state = BUILD_SUCCEEDED;
-    } else if (*data == BUILD_FIXING_BY_SOMEONE_ELSE) {
+    } else if (*data == BUILD_FIXING_BY_SOMEONE_ELSE && state != BUILD_FIXING) {
       state = BUILD_FIXING_WAITING;
     }
   }
@@ -194,10 +192,10 @@ void setupBLE() {
   buildStatusCharacteristic.setWriteCallback(writeCallback);
   buildStatusCharacteristic.begin();
 
-  buildFixingCharacteristic.setProperties(CHR_PROPS_READ);
+  buildFixingCharacteristic.setProperties(CHR_PROPS_NOTIFY);
   buildFixingCharacteristic.setPermission(SECMODE_OPEN, SECMODE_NO_ACCESS);
   buildFixingCharacteristic.setFixedLen(1);
-  buildFixingCharacteristic.write16(BUILD_NOT_FIXING_NOTIFICATION);
+  buildFixingCharacteristic.notify(BUILD_NOT_FIXING_NOTIFICATION, sizeof(BUILD_NOT_FIXING_NOTIFICATION));
   buildFixingCharacteristic.begin();
   
   startAdvertising();

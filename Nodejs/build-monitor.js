@@ -1,7 +1,8 @@
 const noble = require("@abandonware/noble");
 const mqtt = require("mqtt");
 
-const broker = "mqtt://test.mosquitto.org";
+//const broker = "mqtt://test.mosquitto.org";
+const broker = "mqtt://broker.hivemq.com";
 const client = mqtt.connect(broker);
 
 const serviceUuid = "4242";
@@ -31,6 +32,19 @@ noble.on("discover", (peripheral) => {
                         } else if (characteristic.uuid === "2728") {
                             fixingStatusCharacteristic = characteristic;
                             console.log("found 2728");
+                            fixingStatusCharacteristic.subscribe((error) => {
+                                console.log("An error occurred when subscribing to build fixing notifications:", error);
+                            });
+                            fixingStatusCharacteristic.on("data", (data, isNotification) =>{
+                                console.log(data);
+
+                                // TODO: this doesnt work yet
+                                if (data == '01') {
+                                    if (client !== undefined) {
+                                        client.publish("build-monitor/build-status", '02');
+                                    }
+                                }
+                            });
                         }
                     });
                 });
