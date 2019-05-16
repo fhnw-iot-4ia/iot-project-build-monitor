@@ -139,13 +139,13 @@ void loop() {
     leds.setColorRGB(0, 0, 0, 0);
   } else if (color_state == YELLOW) {
     Serial.println("yellow");
-    leds.setColorRGB(0, 255, 213, 87);
+    leds.setColorRGB(0, 255, 191, 0);
   } else if (color_state == ORANGE) {
     Serial.println("orange");
-    leds.setColorRGB(0, 255, 191, 0);
+    leds.setColorRGB(0, 255, 159, 0);
   } else if (color_state == PURPLE1) {
     Serial.println("purple 1");
-    leds.setColorRGB(0, 169, 77, 209);
+    leds.setColorRGB(0, 226, 0, 226);
   } else if (color_state == PURPLE2) {
     Serial.println("purple 2");
     leds.setColorRGB(0, 114, 4, 183);
@@ -194,9 +194,9 @@ void setupBLE() {
 
   buildFixingCharacteristic.setProperties(CHR_PROPS_NOTIFY);
   buildFixingCharacteristic.setPermission(SECMODE_OPEN, SECMODE_NO_ACCESS);
-  buildFixingCharacteristic.setFixedLen(1);
-  buildFixingCharacteristic.notify(BUILD_NOT_FIXING_NOTIFICATION, sizeof(BUILD_NOT_FIXING_NOTIFICATION));
+  buildFixingCharacteristic.setFixedLen(2);
   buildFixingCharacteristic.begin();
+  buildFixingCharacteristic.notify(BUILD_NOT_FIXING_NOTIFICATION, sizeof(BUILD_NOT_FIXING_NOTIFICATION));
   
   startAdvertising();
 }
