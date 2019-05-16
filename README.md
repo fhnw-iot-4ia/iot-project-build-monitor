@@ -20,9 +20,9 @@ The following deliverables are mandatory.
 ### Source code
 Source code, Arduino C, JS or Python, committed to (this) project repo.
 
-Embedded code: [build-monitor.ino](Arduino/build-monitor/build-monitor.ino)
-Gateway code: [build-monitor.js](NodeJS/build-monitor.js)
-App code: [todo](todo)
+Embedded code: [build-monitor.ino](Arduino/build-monitor/build-monitor.ino) 
+Gateway code: [build-monitor.js](Nodejs/build-monitor.js) 
+App code: [todo](todo) 
 
 1) Embedded code / microcontroller firmware.
 2) Glue Code used on the gateway or "in the cloud".
