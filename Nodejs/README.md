@@ -21,6 +21,6 @@ The code is structured as a rudimentary asynchronous program. It connects to an 
 1) connect to the mqtt broker `mqtt://broker.hivemq.com`. 
 2) Once connected, subscribe to the topic `build-monitor/build-status`
 3) As soon as a message is received over mqtt, propagate the message to the connected Adafruit. Only the following states are valid:
-** `BUILD_SUCCEEDED`:  `0x00`
-** `BUILD_FAILED`: `0x01`
-** `BUILD_FIXING_WAITING`: `0x02`
+ * `BUILD_SUCCEEDED`:  `0x00`
+ * `BUILD_FAILED`: `0x01`
+ * `BUILD_FIXING_WAITING`: `0x02`
