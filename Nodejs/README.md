@@ -24,3 +24,10 @@ The code is structured as a rudimentary asynchronous program. It connects to an 
  * `BUILD_SUCCEEDED`:  `0x00`
  * `BUILD_FAILED`: `0x01`
  * `BUILD_FIXING_WAITING`: `0x02`
+
+## Development
+* Make sure to start the program as root: `sudo node build-monitor.js`
+* Install the code to run automatically on startup:
+  * Make sure to have the repository cloned and have the build-monitor.js available in `/home/pi/iot-project-build-monitor/Nodejs/build-monitor.js`
+  * Make sure to have a file `/home/pi/build-monitor.logs`
+  * Insert `su -c 'node /home/pi/iot-project-build-monitor/Nodejs/build-monitor.js < /dev/null > /home/pi/build-monitor.logs &'` into the file `/etc/rc.local`
