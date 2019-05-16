@@ -20,7 +20,7 @@ The following deliverables are mandatory.
 ### Source code
 Source code, Arduino C, JS, committed to (this) project repo:
 
-1) [Embedded code / microcontroller firmware] (Arduino/build-monitor/build-monitor.ino)
+1) [Embedded code](Arduino/build-monitor/build-monitor.ino)
 2) [Glue Code used on the gateway or "in the cloud"](Nodejs/build-monitor.js) 
 3) [App or Web UI code, or IoT platform setup steps](todo) 
 
