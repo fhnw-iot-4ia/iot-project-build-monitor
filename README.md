@@ -37,7 +37,7 @@ Source code, Arduino C, JS, committed to (this) project repo:
 ### Live demo
 Working end-to-end prototype, "device to cloud", part of your 10' presentation.
 
-[https://todo:PORT/](https://todo:PORT/)
+[Jenkins](https://34.65.62.232) - not certificates in place
 
 1) Sensor input on a IoT device triggers an event.
 2) The event or measurement shows up online, in an app or Web client.
