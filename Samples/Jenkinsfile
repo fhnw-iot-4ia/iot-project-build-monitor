@@ -7,7 +7,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    if (${params.buildControlFlag} == 'build') {
+                    if (params.buildControlFlag == 'build') {
                        mqttNotification {
                            brokerUrl "mqtt://broker.hivemq.com"
                            topic "build-monitor/build-status"
@@ -21,7 +21,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    if (${params.buildControlFlag} == 'test') {
+                    if (params.buildControlFlag == 'test') {
                        mqttNotification {
                            brokerUrl "mqtt://broker.hivemq.com"
                            topic "build-monitor/build-status"
