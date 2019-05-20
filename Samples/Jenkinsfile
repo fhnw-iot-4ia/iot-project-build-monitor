@@ -9,9 +9,9 @@ pipeline {
                 script {
                     if (params.buildControlFlag == 'build') {
                        mqttNotification {
-                           brokerUrl "mqtt://broker.hivemq.com"
-                           topic "build-monitor/build-status"
-                           message "01"
+                           brokerUrl = "mqtt://broker.hivemq.com"
+                           topic = "build-monitor/build-status"
+                           message = "01"
                        }
                        error "build has failed!"
                     }
@@ -23,9 +23,9 @@ pipeline {
                 script {
                     if (params.buildControlFlag == 'test') {
                        mqttNotification {
-                           brokerUrl "mqtt://broker.hivemq.com"
-                           topic "build-monitor/build-status"
-                           message "01"
+                           brokerUrl = "mqtt://broker.hivemq.com"
+                           topic = "build-monitor/build-status"
+                           message = "01"
                        }
                        error "test has failed!"
                     }
