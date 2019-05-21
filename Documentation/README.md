@@ -23,6 +23,16 @@ When the last build failed and succeeds again, users should be notified that the
 When the build failed a user can push the physical button (attached to the Adafruit) to commit that he/she fixes the build. His/her LED will start blinking yellow and orange. Other peoples LEDs will start blinking in two different purple tones. This helps distributed teams to realize that someone takes over responsibility to fixing a failing build.
 
 ## Used Protocols and Technology
+
+### Hardware
+* [Adafruit](https://github.com/tamberg/fhnw-iot/wiki/Feather-nRF52840-Express)
+* [Grove Shield](https://github.com/tamberg/fhnw-iot/wiki/Grove-Adapters#grove-shield-for-feather)
+* [Button](https://github.com/tamberg/fhnw-iot/wiki/Grove-Sensors#button)
+* [Buzzer](https://github.com/tamberg/fhnw-iot/wiki/Grove-Actuators#buzzer)
+* [Chainable LED](https://github.com/tamberg/fhnw-iot/wiki/Grove-Actuators#chainable-rgb-led)
+* [Raspberry Pi Zero W](https://github.com/tamberg/fhnw-iot/wiki/Raspberry-Pi-Zero-W)
+
+### Software:
 Technology  | Endpoints | Values
 ----------- | --------- | ------
 Wires | Adafruit, LED, buzzer, Button | HIGH and LOW, different colors
