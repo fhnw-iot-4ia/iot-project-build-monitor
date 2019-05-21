@@ -15,6 +15,11 @@ Chainable LED | Gives visual feedback on the build status | `D4/D5` on Grove Shi
 Buzzer | Gives acoustic feedback if the build failed | `D2` on Grove Shield
 Button | Used to commit fixing of failed build | `A0`
 
+# BLE
+The resulting component will offer a BLE service with uuid `0x4242` which offers two characteristics:
+* Characteristic with uuid `0x2727` is writable and changes the state according to the table below.
+* Characteristic with uuid `0x2728` is subscribable and sends `01` in case the button was pressed (and the state was `BUILD_FAILED` and changed to `BUILD_FIXING`)
+
 # State Machine
 The code is structured as a time machine. The main state is an int which can take on of the following states:
 

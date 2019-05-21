@@ -36,7 +36,7 @@ When the build failed a user can push the physical button (attached to the Adafr
 Technology  | Endpoints | Values | More information
 ----------- | --------- | ------ | ----------------
 Wires | Adafruit, LED, buzzer, Button | HIGH and LOW, different colors | [Arduino Documentation](../Arduino/)
-BLE         | Service `4242`, Characteristic `2727` for WRITE to peripheral | `00` for build success, `01` for build failure, `02` for someone else fixes build | [Arduino Documentation](../Arduino/)
+BLE         | Service `4242`, Characteristic `2727` for WRITE to peripheral | `00` for build success, `01` for build failure, `02` for someone else fixes build | [Nodejs Documentation](../Nodejs/) and [Arduino Documentation](../Arduino/)
 BLE         | Service `4242`, Characteristic `2728` for NOTIFY from peripheral | `00` for no committment, `01` for fixing committment | [Nodejs Documentation](../Nodejs/) and [Arduino Documentation](../Arduino/)
 mqtt        | broker: `mqtt://broker.hivemq.com`, topic: `build-monitor/build-status` | `00` for build success, `01` for build failure, `02` for some committed fixing | [Nodejs Documentation](../Nodejs/)
 http        | https://us-central1-elated-effect-240820.cloudfunctions.net/buildMonitorMqttNotification | POST Request with payload `success` for build success, `failed` for failure | [GCP Function Documentation](../GCP/)
