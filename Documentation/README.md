@@ -21,3 +21,12 @@ When the last build failed and succeeds again, users should be notified that the
 
 ### Commit Fixing
 When the build failed a user can push the physical button (attached to the Adafruit) to commit that he/she fixes the build. His/her LED will start blinking yellow and orange. Other peoples LEDs will start blinking in two different purple tones. This helps distributed teams to realize that someone takes over responsibility to fixing a failing build.
+
+## Used Protocols and Technology
+Technology  | Endpoints | Values
+----------- | --------- | ------
+Wires | Adafruit, LED, buzzer, Button | HIGH and LOW, different colors
+BLE         | Service 4242, Characteristic 2727 for WRITE to peripheral | `00` for build success, `01` for build failure, `02` for someone else fixes build
+BLE         | Service 4242, Characteristic 2728 for NOTIFY from peripheral | `00` for no committment, `01` for fixing committment
+mqtt        | broker: mqtt://broker.hivemq.com, topic: build-monitor/build-status | `00` for build success, `01` for build failure, `02` for some committed fixing
+http        | https://us-central1-elated-effect-240820.cloudfunctions.net/buildMonitorMqttNotification | POST Request with payload `success` for build success, `failed` for failure
