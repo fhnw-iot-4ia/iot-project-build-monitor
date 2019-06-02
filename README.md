@@ -21,13 +21,13 @@ The following deliverables are mandatory.
 Source code, Arduino C, JS, committed to (this) project repo:
 
 1) [Embedded code](Arduino/build-monitor/build-monitor.ino)
-2) [Glue Code used on the gateway or "in the cloud"](Nodejs/build-monitor.js) 
-3) [App or Web UI code, or IoT platform setup steps](todo) 
+2) [Glue Code used on the gateway](Nodejs/build-monitor.js) 
+3) [Glue Code used in the cloud](GCP/Index.js) 
 
 ### Presentation
 4-slide presentation, PDF format, committed to (this) project repo.
 
-[build-monitor-presentation.pdf](build-monitor-presentation.pdf)
+[build-monitor-presentation.pdf](Documentation/build-monitor-presentation.pdf)
 
 1) Use-case of your project.
 2) Reference model of your project.
@@ -37,7 +37,7 @@ Source code, Arduino C, JS, committed to (this) project repo:
 ### Live demo
 Working end-to-end prototype, "device to cloud", part of your 10' presentation.
 
-* [Jenkins](https://34.65.62.232) - not certificates in place
+* [Jenkins](https://34.65.62.232) - no certificates in place
 * mqtt broker: [HiveMQ](broker.hivemq.com) topic: build-monitor/build-status
 
 1) Sensor input on a IoT device triggers an event.
